@@ -46,11 +46,13 @@ DB_NAME=library_db
 DB_USER=lisa_admin
 DB_PASSWORD=your_secure_password
 DB_PORT_EXTERNAL=5555
+```
 
 #### 3. Запуск у режимі розробки (з гарячим перезавантаженням)
-Для запуску середовища з активованим Spring DevTools та монтуванням папок (`volumes`) виконайте команду у вашому терміналі:
+Для запуску середовища... виконайте команду у вашому терміналі:
 ```bash
 docker compose -f compose.yaml -f docker-compose.dev.yml up --build
+```
 
 #### 4. Доступ до застосунку
 * **Клієнтський інтерфейс (Фронтенд):** Перейдіть у браузері за адресою `http://localhost:8081`
@@ -125,6 +127,7 @@ DB_NAME=library_db
 DB_USER=lisa_admin
 DB_PASSWORD=your_secure_password
 DB_PORT_EXTERNAL=5555
+```
 
 #### 3. Spin Up Development Mode (with Hot Reloading)
 To trigger the automated developer workflow utilizing multi-stage configurations and mounted volumes, run:
