@@ -136,7 +136,7 @@ docker compose -f compose.yaml -f docker-compose.dev.yml up --build
 ```
 
 #### 4. Accessing the Application
-* **Web Client (UI):** Open your browser and navigate to `http://localhost:8081`
+* **Web Client (UI):** Open your browser and navigate to `http://localhost:8080`
 * **Database Connection:** Exposed externally via port `5555`
 
 #### 🔐 Demo Credentials (Seeded automatically via `init.sql`):
