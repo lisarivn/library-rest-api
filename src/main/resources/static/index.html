@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library REST API Client</title>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-hover: #3a53d0;
+            --secondary: #6c757d;
+            --success: #198754;
+            --success-hover: #157347;
+            --danger: #dc3545;
+            --danger-hover: #bb2d3b;
+            --warning: #ffc107;
+            --warning-hover: #ffca2c;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: #e9ecef;
+            --text-dark: #212529;
+            --text-muted: #6c757d;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            margin: 40px; 
+            background-color: var(--bg-color); 
+            color: var(--text-dark);
+        }
+        
+        .container { 
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1, h2, h3 { color: var(--text-dark); margin-top: 0; }
+       
+        ul { list-style-type: none; padding: 0; margin: 0; }
+        li, .sub-item { 
+            background: var(--card-bg); 
+            margin: 10px 0; 
+            padding: 15px 20px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        li:hover, .sub-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+        }
+        
+        /* Flexbox for main lists (Libraries, Departments) */
+        li { display: flex; justify-content: space-between; align-items: center; }
+        
+        /* Grid for detailed lists (Subjects, Literature) */
+        .sub-item { 
+            display: grid; 
+            grid-template-columns: 1.5fr 100px 2fr auto; 
+            gap: 15px; 
+            align-items: center; 
+        }
+        .sub-item span { text-align: center; color: var(--text-muted); font-size: 0.95em; }
+
+        /* Panels */
+        .login-box { margin-bottom: 20px; padding: 20px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-color); }
+        .admin-panel { margin-bottom: 20px; padding: 20px; border-radius: 8px; border: 1px dashed var(--secondary); background: #fdfdfe; }
+        
+        /* Inputs & Buttons */
+        input { 
+            padding: 8px 12px; 
+            margin-right: 10px; 
+            margin-bottom: 10px; 
+            border: 1px solid #ced4da; 
+            border-radius: 4px;
+            outline: none;
+        }
+        input:focus { border-color: var(--primary); }
+        
+        button { 
+            cursor: pointer; 
+            padding: 8px 16px; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            margin-left: 5px; 
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+        
+        .login-btn, .action-btn { background-color: var(--primary); }
+        .login-btn:hover, .action-btn:hover { background-color: var(--primary-hover); }
+        
+        .nav-btn { background-color: var(--primary); margin-bottom: 15px; margin-left: 0; }
+        .nav-btn:hover { background-color: var(--primary-hover); }
+        
+        .success-btn { background-color: var(--success); }
+        .success-btn:hover { background-color: var(--success-hover); }
+        
+        .logout-btn { background-color: var(--secondary); float: right; }
+        
+        .delete-btn { background-color: var(--danger); padding: 8px 12px; }
+        .delete-btn:hover { background-color: var(--danger-hover); }
+        
+        .edit-btn { background-color: var(--warning); color: #000; padding: 8px 12px; }
+        .edit-btn:hover { background-color: var(--warning-hover); }
+        
+        .cancel-btn { background-color: var(--secondary); }
+        .action-btns { display: flex; gap: 5px; justify-content: flex-end; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="logout-btn" id="logout-btn" onclick="logout()" style="display: none;">Logout</button>
+    
+    <div class="login-box" id="login-form">
+        <h2>System Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button class="login-btn" onclick="handleLogin()">Login</button>
+    </div>
+
+    <div id="libraries-view" style="display: none;">
+        <h1>📚 Libraries Hub </h1>
+        
+        <div class="admin-panel" id="lib-admin-panel" style="display: none;"> 
+            <h3 id="lib-panel-title">🛠️ Add Library</h3>
+            <input type="text" id="lib-name" placeholder="Library Name">
+            <input type="number" id="lib-deps" placeholder="Total Departments" value="1" min="0">
+            <button class="success-btn" id="submit-lib-btn" onclick="saveLibrary()">Create</button>
+            <button class="cancel-btn" id="cancel-lib-btn" onclick="cancelLibEdit()" style="display: none;">Cancel</button>
+        </div>
+        
+        <div id="libraries-list">Loading...</div>
+    </div>
+
+    <div id="departments-view" style="display: none;">
+        <button class="nav-btn" onclick="showLibrariesView()">🔙 Back to Libraries </button>
+        <h1 id="dep-page-title">Departments</h1>
+        
+        <div class="admin-panel" id="dep-admin-panel" style="display: none;">
+            <h3 id="dep-panel-title">🛠️ Add Department </h3>
+            <input type="text" id="dep-name" placeholder="Department Name">
+            <input type="text" id="dep-dean" placeholder="Dean Name">
+            <label style="margin-right: 15px; cursor: pointer;">
+                <input type="checkbox" id="dep-spec"> Special Access
+            </label>
+            <button class="success-btn" id="submit-dep-btn" onclick="saveDepartment()">Create</button>
+            <button class="cancel-btn" id="cancel-dep-btn" onclick="cancelDepEdit()" style="display: none;">Cancel</button>
+        </div>
+        
+        <div id="departments-list">Loading...</div>
+    </div>
+    
+    <div id="subjects-view" style="display: none;">
+        <button class="nav-btn" onclick="showDepartmentsView(currentLibId, 'Departments')">🔙 Back to Departments </button>
+        <h1 id="sub-page-title">Subjects</h1>
+        
+        <div class="admin-panel" id="sub-admin-panel" style="display: none;">
+            <h3 id="sub-panel-title">🛠️ Add Subject </h3>
+            <input type="text" id="sub-name" placeholder="Subject Name">
+            <input type="number" id="sub-credits" placeholder="Credits" min="1">
+            <input type="text" id="sub-syllabus" placeholder="Syllabus Details">
+            <button class="success-btn" id="sub-submit-btn" onclick="saveSubject()">Create</button>
+            <button class="cancel-btn" id="sub-cancel-btn" onclick="cancelSubEdit()" style="display: none;">Cancel</button>
+        </div>
+
+        <div id="subjects-list"></div>
+    </div>
+    
+    <div id="literature-view" style="display: none;">
+        <button class="nav-btn" onclick="showSubjectsView(currentDepId, 'Subjects')">🔙 Back to Subjects </button>
+        <h1 id="lit-page-title">Literature</h1>
+        
+        <div class="admin-panel" id="lit-admin-panel" style="display: none;">
+            <h3 id="lit-panel-title">🛠️ Add Book </h3>
+            <input type="text" id="lit-name" placeholder="Book Title">
+            <input type="text" id="lit-author" placeholder="Author">
+            <input type="number" id="lit-year" placeholder="Publication Year">
+            <button class="success-btn" id="lit-submit-btn" onclick="saveLiterature()">Create</button>
+            <button class="cancel-btn" id="lit-cancel-btn" onclick="cancelLitEdit()" style="display: none;">Cancel</button>
+        </div>
+        
+        <div id="literature-list"></div>
+    </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+    function handleLogin() {
+        login(document.getElementById('username').value, document.getElementById('password').value);
+    }
+</script>
+</body>
+</html>
